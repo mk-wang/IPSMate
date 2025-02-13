@@ -3,6 +3,7 @@ import os
 import sys
 from datetime import datetime
 
+
 def convert_ips_to_crash(ips_file_path, output_filename=None):
     # Read the IPS file
     with open(ips_file_path, 'r') as f:
@@ -13,25 +14,38 @@ def convert_ips_to_crash(ips_file_path, output_filename=None):
 
     # Create crash file name
     if output_filename is None:
-        timestamp = datetime.strptime(header['timestamp'].split()[0] + ' ' + header['timestamp'].split()[1], '%Y-%m-%d %H:%M:%S.%f')
-        crash_filename = header['app_name'] + '_' + timestamp.strftime('%Y-%m-%d_%H-%M-%S') + '.crash'
+        timestamp = datetime.strptime(header['timestamp'].split(
+        )[0] + ' ' + header['timestamp'].split()[1], '%Y-%m-%d %H:%M:%S.%f')
+        crash_filename = header['app_name'] + '_' + \
+            timestamp.strftime('%Y-%m-%d_%H-%M-%S') + '.crash'
     else:
         crash_filename = output_filename
 
     # Convert content to crash format
     crash_content = []
     crash_content.append("Incident Identifier: " + header['slice_uuid'] + "\n")
-    crash_content.append("CrashReporter Key: " + header.get('crashreporter_key', 'unknown') + "\n")
-    crash_content.append("Hardware Model: " + header.get('hardware_model', 'unknown') + "\n")
-    crash_content.append("Process: " + header['app_name'] + " [" + header.get('pid', '0') + "]\n")
+    crash_content.append("CrashReporter Key: " +
+                         header.get('crashreporter_key', 'unknown') + "\n")
+    crash_content.append("Hardware Model: " +
+                         header.get('hardware_model', 'unknown') + "\n")
+    crash_content.append(
+        "Process: " + header['app_name'] +
+        " [" + header.get('pid', '0')
+        + "]\n")
     crash_content.append("Path: " + header.get('path', 'unknown') + "\n")
-    crash_content.append("Identifier: " + header['bundleID'] + "\n")
-    crash_content.append("Version: " + header['build_version'] + " (" + header['app_version'] + ")\n")
+    crash_content.append("Identifier: "
+                         + header['bundleID'] +
+                         "\n")
+    crash_content.append(
+        "Version: " + header['build_version']
+        + " (" + header['app_version']
+        + ")\n")
     crash_content.append("Code Type: ARM-64\n")
     crash_content.append("Role: " + header.get('role', 'Foreground') + "\n")
     crash_content.append("Date/Time: " + header['timestamp'] + "\n")
     crash_content.append("OS Version: " + header['os_version'] + "\n")
-    crash_content.append("Launch Time: " + header.get('launch_time', 'unknown') + "\n")
+    crash_content.append(
+        "Launch Time: " + header.get('launch_time', 'unknown') + "\n")
     crash_content.append("\n")
 
     # Add the rest of the content
@@ -51,6 +65,7 @@ def convert_ips_to_crash(ips_file_path, output_filename=None):
         f.writelines(crash_content)
 
     return output_path
+
 
 def main():
     if len(sys.argv) < 2 or len(sys.argv) > 3:
