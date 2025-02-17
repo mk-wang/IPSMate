@@ -18,7 +18,6 @@ A set of tools to convert and symbolicate iOS crash logs from IPS format. Suppor
 
 ## Files
 
-- `ips2crash.py`: Converts modern IPS format crash logs to standard crash format
 - `symbolicate.py`: Main script to process and symbolicate crash logs
 - `symbolicatecrash`: Legacy symbolication tool
 
