@@ -30,11 +30,28 @@ def get_file_info(crash_file):
     return None, None
 
 
+def find_crash_symbolicator(dir_list=["/Applications/Xcode.app/Contents"]):
+    """Find CrashSymbolicator.py in the given list of directories"""
+    for directory in dir_list:
+        path = os.path.expanduser(directory)
+        try:
+            # Use os.walk instead of Path.rglob since Path is not imported
+            for root, _, files in os.walk(path):
+                for file in files:
+                    if file == "CrashSymbolicator.py":
+                        file_path = os.path.join(root, file)
+                        if os.path.exists(file_path):
+                            return file_path
+        except Exception as e:
+            print(f"Error searching in {directory}: {e}")
+            continue
+
+    return None
+
+
 def symbolicate_crash15(crash_file, dsym_file, output_file):
-    """Symbolicate crash using Xcode 15's CrashSymbolicator"""
-    crash_symbolizer = ("/Applications/Xcode.app/Contents/SharedFrameworks/"
-                        "CoreSymbolicationDT.framework/Versions/A/Resources/"
-                        "CrashSymbolicator.py")
+    """Symbolicate crash using Xcode's CrashSymbolicator"""
+    crash_symbolizer = find_crash_symbolicator()
 
     if not os.path.exists(crash_symbolizer):
         print("Error: Xcode 15 crash symbolizer not found")
