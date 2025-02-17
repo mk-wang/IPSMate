@@ -5,7 +5,7 @@
   },
   "pylint.args": [
     "--disable=C0111",
-    "disable=broad-except",
+    "--disable=broad-except",
     "--max-line-length=120"
   ]
 }
