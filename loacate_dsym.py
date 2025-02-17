@@ -8,10 +8,20 @@ import os
 
 def find_dsym_in_archives(
     crash_uuid,
-    archives_paths=["~/Library/Developer/Xcode/Archives"]
+    archives_paths=None
 ):
     """Search for matching dSYM file in Xcode Archives based on UUID"""
-    import os
+    default_archives_paths = ["~/Library/Developer/Xcode/Archives"]
+    if archives_paths is None:
+        archives_paths = default_archives_paths
+    else:
+        # Convert and filter paths to real paths
+        archives_paths = [
+            os.path.realpath(os.path.expanduser(p))
+            for p in archives_paths + default_archives_paths
+        ]
+        # Remove duplicates while preserving order
+        archives_paths = list(dict.fromkeys(archives_paths))
 
     for path in archives_paths:
         archives_path = os.path.expanduser(path)
@@ -77,6 +87,6 @@ if __name__ == "__main__":
     if result:
         print(f"Found dSYM at: {result}")
         dsym_dir = os.path.dirname(result)
-        subprocess.run(['open', dsym_dir])
+        subprocess.run(['open', dsym_dir], check=True)
     else:
         print(f"No dSYM found for UUID: {args.uuid}")
