@@ -20,6 +20,7 @@ A set of tools to convert and symbolicate iOS crash logs from IPS format. Suppor
 
 - `symbolicate.py`: Main script to process and symbolicate crash logs
 - `symbolicatecrash`: Legacy symbolication tool
+- `loacate_dsym.py`: Utility to find dSYM files by UUID in Xcode Archives
 
 ## Installation
 
@@ -44,8 +45,16 @@ chmod +x symbolicatecrash
 python symbolicate.py crash.ips
 ```
 
+```bash
+python symbolicate.py crash.ips --dsym /path/to/app.dSYM
+```
+
 ### Specify dSYM File
 
 ```bash
-python symbolicate.py crash.ips --dsym /path/to/app.dSYM
+# Search in default Xcode Archives location
+python loacate_dsym.py 12345678-1234-1234-1234-1234567890AB
+
+# Search in multiple custom locations
+python loacate_dsym.py 12345678-1234-1234-1234-1234567890AB --archives ~/Archives1 ~/Archives2
 ```

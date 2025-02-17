@@ -1,44 +1,11 @@
+#!/usr/bin/python3
+
 import json
 import os
 import subprocess
 import re
 import argparse
-from pathlib import Path
-
-
-def find_dsym_in_archives(crash_uuid):
-    """Search for matching dSYM file in Xcode Archives based on UUID"""
-    archives_path = os.path.expanduser("~/Library/Developer/Xcode/Archives")
-
-    # Find all .xcarchive directories
-    for archive in Path(archives_path).rglob("*.xcarchive"):
-        dsyms_path = archive / "dSYMs"
-        if not dsyms_path.exists():
-            continue
-
-        # Search through all dSYM files in the archive
-        for dsym in dsyms_path.rglob("*.dSYM"):
-            try:
-                # Run dwarfdump to get UUID
-                result = subprocess.run(
-                    ["dwarfdump", "--uuid", str(dsym)],
-                    capture_output=True,
-                    text=True,
-                    check=True
-                )
-
-                # Extract UUID from dwarfdump output
-                uuid_match = re.search(
-                    r'UUID: ([0-9A-F-]+)', result.stdout, re.IGNORECASE)
-                if uuid_match:
-                    dsym_uuid = uuid_match.group(1)
-                    if dsym_uuid.upper() == crash_uuid.upper():
-                        return str(dsym)
-
-            except subprocess.CalledProcessError:
-                continue
-
-    return None
+from loacate_dsym import find_dsym_in_archives
 
 
 def get_file_info(crash_file):
