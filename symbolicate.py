@@ -6,6 +6,7 @@ import subprocess
 import re
 import argparse
 from loacate_dsym import find_dsym_in_archives
+from loacate_dsym import remove_duplicates
 
 
 def get_file_info(crash_file):
@@ -30,8 +31,14 @@ def get_file_info(crash_file):
     return None, None
 
 
-def find_crash_symbolicator(dir_list=["/Applications/Xcode.app/Contents"]):
+def find_crash_symbolicator(dir_list=None):
     """Find CrashSymbolicator.py in the given list of directories"""
+    default_xcode_path = "/Applications/Xcode.app/Contents"
+    if dir_list is None:
+        dir_list = [default_xcode_path]
+    else:
+        dir_list = remove_duplicates([default_xcode_path] + [default_xcode_path])
+
     for directory in dir_list:
         path = os.path.expanduser(directory)
         try:
@@ -95,7 +102,7 @@ def symbolicate_crash(crash_file, dsym_file, output_file):
             check=True
         )
 
-        with open(output_file, 'w') as f:
+        with open(output_file, 'w', encoding='utf-8') as f:
             f.write(result.stdout)
         return True
     except subprocess.CalledProcessError as e:
@@ -170,15 +177,14 @@ def main():
         # Generate default output filename if not specified
         output_file = args.output_file or os.path.splitext(
             args.ips_file)[0] + "_symbolicated.crash"
-        result = False
+        symbolicate_result = False
         print(
             f"Symbolicating : {ips_file}, new version: {is_new_version}")
         if is_new_version:
-            result = symbolicate_crash15(ips_file, dsym_file, output_file)
+            symbolicate_result = symbolicate_crash15(ips_file, dsym_file, output_file)
         else:
-            result = symbolicate_crash(ips_file, dsym_file, output_file)
-
-        if result:
+            symbolicate_result = symbolicate_crash(ips_file, dsym_file, output_file)
+        if symbolicate_result:
             print(f"Symbolication successful, output file: {output_file}")
 
     except Exception as e:

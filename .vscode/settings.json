@@ -3,9 +3,10 @@
     "editor.defaultFormatter": "ms-python.pylint",
     "editor.formatOnType": true
   },
+
   "pylint.args": [
+    "--max-line-length=120",
     "--disable=C0111",
-    "--disable=broad-except",
-    "--max-line-length=120"
+    "--disable=broad-except"
   ]
 }

@@ -6,6 +6,22 @@ import re
 import os
 
 
+def remove_duplicates(file_list):
+    """
+    Remove duplicates from a list of paths by resolving them to their real paths.
+    Maintains the original order while removing duplicates.
+    """
+    seen = set()
+    result = []
+    for path in file_list:
+        # Expand user path (handle ~) and resolve to real path
+        real_path = os.path.realpath(os.path.expanduser(str(path)))
+        if real_path not in seen:
+            seen.add(real_path)
+            result.append(real_path)
+    return result
+
+
 def find_dsym_in_archives(
     crash_uuid,
     archives_paths=None
@@ -15,13 +31,7 @@ def find_dsym_in_archives(
     if archives_paths is None:
         archives_paths = default_archives_paths
     else:
-        # Convert and filter paths to real paths
-        archives_paths = [
-            os.path.realpath(os.path.expanduser(p))
-            for p in archives_paths + default_archives_paths
-        ]
-        # Remove duplicates while preserving order
-        archives_paths = list(dict.fromkeys(archives_paths))
+        archives_paths = remove_duplicates(default_archives_paths + archives_paths)
 
     for path in archives_paths:
         archives_path = os.path.expanduser(path)
@@ -82,11 +92,11 @@ if __name__ == "__main__":
                         nargs='+')
 
     args = parser.parse_args()
-    result = find_dsym_in_archives(args.uuid, args.archives)
+    dsym_dir = find_dsym_in_archives(args.uuid, args.archives)
 
-    if result:
-        print(f"Found dSYM at: {result}")
-        dsym_dir = os.path.dirname(result)
+    if dsym_dir:
+        dsym_dir(f"Found dSYM at: {dsym_dir}")
+        dsym_dir = os.path.dirname(dsym_dir)
         subprocess.run(['open', dsym_dir], check=True)
     else:
         print(f"No dSYM found for UUID: {args.uuid}")
