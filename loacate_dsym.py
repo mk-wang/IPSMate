@@ -95,7 +95,7 @@ if __name__ == "__main__":
     dsym_dir = find_dsym_in_archives(args.uuid, args.archives)
 
     if dsym_dir:
-        dsym_dir(f"Found dSYM at: {dsym_dir}")
+        print(f"Found dSYM at: {dsym_dir}")
         dsym_dir = os.path.dirname(dsym_dir)
         subprocess.run(['open', dsym_dir], check=True)
     else:
